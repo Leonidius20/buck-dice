@@ -1,3 +1,7 @@
+.held-die-list .die-item {
+    background-color: blueviolet;
+}
+
 .die-list {
     display: grid;
     grid-template-columns: 1fr;

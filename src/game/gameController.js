@@ -37,28 +37,29 @@ export default class GameController {
 
     makeMove(die1, die2, die3) {
         const score = this.calculateScore(die1, die2, die3);
-        console.log(score);
-        this.currentPlayer.score += score;
         this.currentPlayer.consecutiveMoves++;
-        const newScore = this.currentPlayer.score;
+        const newScore = this.currentPlayer.score + score;
 
         if (newScore >= 15) {
             this.winner = this.currentPlayer;
+            this.currentPlayer.score = newScore;
             this.view.updateState();
         } else {
-            if (this.currentPlayer.consecutiveMoves === 3 || this.currentPlayer.pass === true) {
-                this.currentPlayer = this.getNonCurrentPlayer();
+            if (this.currentPlayer.consecutiveMoves === 3) {
+                this.currentPlayer.score = newScore;
                 this.currentPlayer.consecutiveMoves = 0;
+                this.currentPlayer = this.getNonCurrentPlayer();
+                this.view.resetDieHold();
             }
 
             this.view.updateState();
+
             if (this.currentPlayer === this.aiPlayer) {
                 this.decideOnAiMove();
             }
         }
     }
 
-    // returns score and whether the player should continue throwing
     calculateScore(firstDie, secondDie, thirdDie) {
         const point = this.pointNumber;
 
@@ -69,15 +70,12 @@ export default class GameController {
             score = firstDie == point ? 15 : 5;
         } else {
             if (firstDie == point) {
-                console.log('match');
                 score++;
             }
             if (secondDie == point) {
-                console.log('match');
                 score++;
             }
             if (thirdDie == point) {
-                console.log('match');
                 score++;
             }
         }
@@ -90,8 +88,50 @@ export default class GameController {
     }
 
     decideOnAiMove() {
-        this.view.rollAllDice();
+        if (this.aiPlayer.consecutiveMoves === 0) {
+            this.view.rollAllDice();
+            return;
+        }
 
+        let bestMove = [false, false, false];
+        let bestValue = this.calculateScore(...this.view.getDiceValues());
+
+        for (const move of this.getPossibleMoves()) {
+            const value = this.evaluatePossibleMove(move);
+            if (value > bestValue) {
+                bestMove = move;
+                bestValue = value;
+            }
+        }
+
+        this.view.rollDice(bestMove);
+    }
+
+    evaluatePossibleMove(move) {
+        let value = 0;
+
+        let tempCombo = this.view.getDiceValues();
+
+        for (let i = 1; i <= 6; i++) { // changing value of first die
+            if (move[0]) tempCombo[0] = i;
+            for (let j = 1; j <= 6; j++) { // changing value of first die
+                if (move[1]) tempCombo[1] = j;
+                for (let k = 1; k <= 6; k++) { // changing value of first die
+                    if (move[2]) tempCombo[2] = k;
+                    value += (1.0 / 216.0) * this.calculateScore(...tempCombo);
+                }
+            }
+        }
+
+        return value;
+    }
+
+    getPossibleMoves() {
+        const result = [];
+        for (let i = 0; i < 1 << 3; i++) {
+            result.push([!!(i & (1<<2)), !!(i & (1<<1)), !!(i & 1)]);
+        }
+        return result;
     }
 
 }

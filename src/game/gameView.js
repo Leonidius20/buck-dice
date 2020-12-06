@@ -15,7 +15,7 @@ export default class GameView {
 
         this.rollButton.onclick = () => {
             this.firstDie.roll();
-            setTimeout(() => this.controller.setPlayerInitialNumber(),  500);
+            setTimeout(() => this.controller.setPlayerInitialNumber(),  1500);
         }
         this.rollButton.innerText = 'Roll to draw';
     }
@@ -27,12 +27,19 @@ export default class GameView {
         this.firstDie.roll();
         setTimeout(() => {
             this.controller.setAiInitialNumber(this.firstDie.value);
-        },  500);
+        },  1500);
     }
 
     prepareForGame() {
+        this.firstDie.onclick = () => this.onDieClicked(0);
+
         this.secondDie = document.createElement('die-block');
+        this.secondDie.onclick = () => this.onDieClicked(1);
+
         this.thirdDie = document.createElement('die-block');
+        this.thirdDie.onclick = () => this.onDieClicked(2);
+
+        this.dice = [this.firstDie, this.secondDie, this.thirdDie];
 
         this.diceContainer.append(this.secondDie, this.thirdDie);
 
@@ -46,8 +53,15 @@ export default class GameView {
         this.currentPlayer = document.getElementById('current-player');
         this.pointNumber = document.getElementById('point-number');
 
-        this.rollButton.onclick = () => this.rollAllDice();
+        this.heldDice = [false, false, false]; // dice held by player
+
+        this.rollButton.onclick = () => {
+            this.rollDice(this.heldDice.map(value => !value));
+        };
+
         this.rollButton.innerText = 'Roll';
+
+
     }
 
     updateState() {
@@ -77,14 +91,47 @@ export default class GameView {
         this.thirdDie.roll();
         this.secondDie.roll();
         this.firstDie.roll();
-        setTimeout(() => this.onDiceRolled(), 1500);
+        setTimeout(() => this.onDiceRolled(), 2000);
     }
 
-    rollDice([first, second, third]) {
-        if (first) this.firstDie.roll();
-        if (second) this.secondDie.roll();
-        if (third) this.thirdDie.roll();
-        setTimeout(this.onDiceRolled, 1500);
+    rollDice(move) {
+        const dice = [this.firstDie, this.secondDie, this.thirdDie];
+
+        for (let i = 0; i < 3; i++) {
+            if (move[i]) {
+                dice[i].makeBigger();
+                dice[i].roll();
+            } else {
+                dice[i].makeSmaller();
+            }
+
+        }
+
+        setTimeout(() => this.onDiceRolled(), 2000);
+    }
+
+    getDiceValues() {
+        const die1 = this.firstDie.value;
+        const die2 = this.secondDie.value;
+        const die3 = this.thirdDie.value;
+        return [die1, die2, die3];
+    }
+
+    resetDieHold() {
+        for (const die of this.dice) {
+            die.makeBigger();
+        }
+        this.heldDice = [false, false, false];
+    }
+
+    onDieClicked(index) {
+        if (this.controller.currentPlayer === this.controller.humanPlayer
+            && this.controller.humanPlayer.consecutiveMoves > 0) {
+            this.heldDice[index] = !this.heldDice[index];
+            if (this.heldDice[index] === true) {
+                this.dice[index].makeSmaller();
+            } else this.dice[index].makeBigger();
+        }
     }
 
 }

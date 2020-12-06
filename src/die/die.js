@@ -44,4 +44,12 @@ export default class Die extends HTMLElement {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    makeSmaller() {
+        this.shadowRoot.getElementById('die-1').classList.add('held-die-list');
+    }
+
+    makeBigger() {
+        this.shadowRoot.getElementById('die-1').classList.remove('held-die-list');
+    }
+
 }
