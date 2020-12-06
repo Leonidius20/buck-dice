@@ -1,0 +1,22 @@
+{
+  "name": "buck-dice",
+  "version": "1.0.0",
+  "description": "A buck dice game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Leonidius20/buck-dice.git"
+  },
+  "author": "Leonidius20",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Leonidius20/buck-dice/issues"
+  },
+  "homepage": "https://github.com/Leonidius20/buck-dice#readme",
+  "dependencies": {
+    "webpack": "^5.10.0"
+  }
+}
