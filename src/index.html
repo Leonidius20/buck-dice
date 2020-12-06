@@ -3,9 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Buck Dice</title>
+    <style>
+        #dice-container {
+            align-items: center;
+            display: grid;
+            grid-gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+            grid-template-rows: auto;
+            justify-items: center;
+            padding: 2rem;
+            perspective: 600px;
+            height: 50vh;
+        }
+    </style>
 </head>
 <body>
-    <die-block id="die"></die-block>
-    <button id="roll-dice-button">Roll</button>
+    <div id="container">
+        <div id="dice-container"></div>
+        <button id="roll-button"></button>
+        <div id="text-container"></div>
+    </div>
 </body>
 </html>
